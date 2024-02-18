@@ -10,6 +10,9 @@ export const theme = createTheme({
     secondary: {
       main: "#19857b",
     },
+    text: {
+      secondary: '#f5f5f5'
+    }
   },
 });
 const App = ({ Component, pageProps }: AppProps) => {

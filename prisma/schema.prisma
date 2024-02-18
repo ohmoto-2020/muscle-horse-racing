@@ -47,9 +47,6 @@ model Horse {
   createdAt   DateTime     @default(now())
   voteHistories VoteHistory[]
   race        Race         @relation(fields: [raceId], references: [id])
-  // firstHorseResults RaceResult[] @relation("FirstHorse")
-  // secondHorseResults RaceResult[] @relation("SecondHorse")
-  // thirdHorseResults RaceResult[] @relation("ThirdHorse")
   raceResultsAsFirstHorse RaceResult[] @relation("FirstHorse")
   raceResultsAsSecondHorse RaceResult[] @relation("SecondHorse")
   raceResultsAsThirdHorse RaceResult[] @relation("ThirdHorse")

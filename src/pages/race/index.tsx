@@ -1,8 +1,13 @@
-import { Box, Typography } from "@mui/material";
-import { DataGrid } from "@mui/x-data-grid";
+import { Box, Button, Typography } from "@mui/material";
+import { DataGrid, GridRowParams } from "@mui/x-data-grid";
 import { GetStaticProps } from "next";
 import { Race } from "@/types/race";
 import prisma from "lib/prisma";
+import { makeStyles } from "@mui/styles";
+import { useRouter } from "next/router";
+import { useState } from "react";
+import { ScrapingDialog } from "@/components/scraping-dialog";
+import { Racecourse } from "@/types/racecourse";
 
 export const getStaticProps: GetStaticProps = async () => {
   const races = await prisma.race.findMany({
@@ -12,6 +17,7 @@ export const getStaticProps: GetStaticProps = async () => {
       racetrackDistance: true,
     },
   });
+  const racecourses = await prisma.racecourse.findMany();
 
   const serializedRaces = races.map((race) => ({
     ...race,
@@ -29,20 +35,32 @@ export const getStaticProps: GetStaticProps = async () => {
     },
   }));
   return {
-    props: { races: serializedRaces },
+    props: { races: serializedRaces, racecourses },
     revalidate: 10,
   };
 };
 
+const useStyles = makeStyles(() => ({
+  root: {
+    "& .MuiTablePagination-selectLabel": {
+      display: "none",
+    },
+    "& .MuiTablePagination-input": {
+      display: "none",
+    },
+  },
+}));
+
 type Props = {
   races: Race[];
+  racecourses: Racecourse[];
 };
 
 export default function RacePage(props: Props) {
-  const { races } = props;
+  const { races, racecourses } = props;
+  const router = useRouter();
 
   const columns = [
-    { field: "id", headerName: "ID", width: 50 },
     {
       field: "racecourse",
       headerName: "競馬場",
@@ -70,11 +88,65 @@ export default function RacePage(props: Props) {
     },
   ];
 
+  const handleClick = (params: GridRowParams) => {
+    router.push(`/race/${params.row.id}`);
+  };
+
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+
+  const handleGet = async (racecourseCode: number, raceNumber: number) => {
+    console.log(raceNumber, racecourseCode);
+    // try {
+    //   const response = await fetch('/api/races', {
+    //     method: 'POST',
+    //     headers: {
+    //       'Content-Type': 'application/json',
+    //     },
+    //     body: JSON.stringify({
+    //       racecourseCode,
+    //       raceNumber,
+    //     }),
+    //   });
+    //   if (!response.ok) {
+    //     throw new Error('スクレイピングに失敗しました');
+    //   }
+    //   // スクレイピング結果の処理...
+    // } catch (error) {
+    //   console.error(error);
+    // }
+  };
+
+  const handleOpen = () => {
+    setIsOpen(true);
+  };
+
   return (
     <>
-      <Typography sx={{ mb: "8px" }}>レース一覧</Typography>
-      <Box>
-        <DataGrid rows={races} columns={columns} />
+      <ScrapingDialog
+        isOpen={isOpen}
+        onGet={handleGet}
+        onClose={() => setIsOpen(false)}
+        racecourses={racecourses}
+      />
+
+      <Box
+        sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: "20px" }}
+      >
+        <Typography sx={{ fontWeight: "bold" }}>レース一覧</Typography>
+        <Button variant="contained" onClick={handleOpen}>
+          レース情報取得
+        </Button>
+      </Box>
+      <Box maxHeight="90vh">
+        <DataGrid
+          className={useStyles().root}
+          rows={races}
+          columns={columns}
+          onRowClick={(e) => handleClick(e)}
+          hideFooterSelectedRowCount={true}
+          disableRowSelectionOnClick
+          pagination
+        />
       </Box>
     </>
   );

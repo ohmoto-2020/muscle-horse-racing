@@ -1,7 +1,7 @@
 import React, { ReactNode, useEffect, useState } from "react";
 import Header from "./Header";
 import { useRouter } from "next/router";
-import { CircularProgress } from "@mui/material";
+import { CircularProgress, Container } from "@mui/material";
 
 type Props = {
   children: ReactNode;
@@ -41,7 +41,9 @@ const Layout: React.FC<Props> = (props) => {
           <CircularProgress />
         </div>
       ) : (
-        <div className="layout">{props.children}</div>
+        <Container maxWidth="xs" sx={{ mt: "72px" }}>
+          {props.children}
+        </Container>
       )}
       <style jsx global>{`
         html {
@@ -71,11 +73,6 @@ const Layout: React.FC<Props> = (props) => {
 
         button {
           cursor: pointer;
-        }
-      `}</style>
-      <style jsx>{`
-        .layout {
-          padding: 2rem 2rem;
         }
       `}</style>
     </div>
