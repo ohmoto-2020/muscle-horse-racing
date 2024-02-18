@@ -61,7 +61,7 @@ const headerStyle = {
 };
 
 const oddRowStyle = {
-  backgroundColor: theme.palette.text.secondary,
+  backgroundColor: "#f5f5f5",
 };
 
 type Props = {

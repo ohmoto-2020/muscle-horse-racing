@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Typography } from "@mui/material";
+import { AppBar, Box, Typography } from "@mui/material";
 import { HorseIcon } from "./icons/horse";
 import { useRouter } from "next/router";
 import { theme } from "@/pages/_app";
@@ -11,7 +11,7 @@ const Header = () => {
   };
 
   return (
-    <Box
+    <AppBar
       onClick={handleClick}
       sx={{
         display: "flex",
@@ -19,11 +19,6 @@ const Header = () => {
         justifyContent: "space-between",
         backgroundColor: theme.palette.primary.main,
         p: "10px 20px",
-        position: "fixed", // ヘッダーを固定
-        top: 0, // 上部から0の位置に
-        left: 0, // 左端から0の位置に
-        width: "100%", // 幅を100%に設定
-        zIndex: 1100, // 他の要素より上に表示
       }}
     >
       <Box
@@ -39,7 +34,7 @@ const Header = () => {
         </Typography>
       </Box>
       <Typography sx={{ fontSize: "10px", color: "#fff" }}>でログイン中</Typography>
-    </Box>
+    </AppBar>
   );
 };
 
