@@ -3,7 +3,6 @@ import { DataGrid, GridRowParams } from "@mui/x-data-grid";
 import { GetStaticProps } from "next";
 import { Race } from "@/types/race";
 import prisma from "lib/prisma";
-import { makeStyles } from "@mui/styles";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { ScrapingDialog } from "@/components/scraping-dialog";
@@ -39,17 +38,6 @@ export const getStaticProps: GetStaticProps = async () => {
     revalidate: 10,
   };
 };
-
-const useStyles = makeStyles(() => ({
-  root: {
-    "& .MuiTablePagination-selectLabel": {
-      display: "none",
-    },
-    "& .MuiTablePagination-input": {
-      display: "none",
-    },
-  },
-}));
 
 type Props = {
   races: Race[];
@@ -139,13 +127,20 @@ export default function RacePage(props: Props) {
       </Box>
       <Box maxHeight="90vh">
         <DataGrid
-          className={useStyles().root}
           rows={races}
           columns={columns}
           onRowClick={(e) => handleClick(e)}
           hideFooterSelectedRowCount={true}
           disableRowSelectionOnClick
           pagination
+          sx={{
+            "& .MuiTablePagination-selectLabel": {
+              display: "none",
+            },
+            "& .MuiTablePagination-input": {
+              display: "none",
+            },
+          }}
         />
       </Box>
     </>
