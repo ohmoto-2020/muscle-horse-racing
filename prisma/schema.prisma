@@ -4,69 +4,67 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url = env("POSTGRES_PRISMA_URL") // uses connection pooling
+  url      = env("POSTGRES_PRISMA_URL") // uses connection pooling
   directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
 }
 
 model User {
   id            Int      @id @default(autoincrement())
   name          String   @default("")
-  email         String?   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  email         String?  @unique
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
   voteHistories VoteHistory[]
 }
 
 model VoteHistory {
-  id         Int           @id @default(autoincrement())
-  userId     Int           @map("user_id")
-  raceId     Int           @map("race_id")
-  horseId    Int           @map("horse_id")
-  rankId     Int           @map("rank_id")
-  createdAt  DateTime      @default(now())
-  user       User          @relation(fields: [userId], references: [id])
-  race       Race          @relation(fields: [raceId], references: [id])
-  horse      Horse         @relation(fields: [horseId], references: [id])
-  rank       Rank          @relation(fields: [rankId], references: [id])
+  id         Int      @id @default(autoincrement())
+  userId     Int      @map("user_id")
+  raceId     Int      @map("race_id")
+  horseId    Int      @map("horse_id")
+  rankId     Int      @map("rank_id")
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id])
+  race       Race     @relation(fields: [raceId], references: [id])
+  horse      Horse    @relation(fields: [horseId], references: [id])
+  rank       Rank     @relation(fields: [rankId], references: [id])
 }
 
 model Rank {
-  id        Int          @id @default(autoincrement())
-  value     String
-  point     Int
-  createdAt DateTime     @default(now())
+  id            Int      @id @default(autoincrement())
+  value         String
+  point         Int
+  createdAt     DateTime @default(now())
   voteHistories VoteHistory[]
 }
 
 model Horse {
-  id          Int          @id @default(autoincrement())
-  raceId      Int          @map("race_id")
-  entryNumber Int          @map("entry_number")
-  name        String
-  weight      Int 
-  createdAt   DateTime     @default(now())
-  voteHistories VoteHistory[]
-  race        Race         @relation(fields: [raceId], references: [id])
-  raceResultsAsFirstHorse RaceResult[] @relation("FirstHorse")
+  id                    Int           @id @default(autoincrement())
+  raceId                Int           @map("race_id")
+  entryNumber           Int           @map("entry_number")
+  name                  String
+  weight                Int
+  createdAt             DateTime      @default(now())
+  voteHistories         VoteHistory[]
+  race                  Race          @relation(fields: [raceId], references: [id])
+  raceResultsAsFirstHorse  RaceResult[] @relation("FirstHorse")
   raceResultsAsSecondHorse RaceResult[] @relation("SecondHorse")
-  raceResultsAsThirdHorse RaceResult[] @relation("ThirdHorse")
+  raceResultsAsThirdHorse  RaceResult[] @relation("ThirdHorse")
 }
 
 model Race {
-  id                     Int                  @id @default(autoincrement())
-  racecourseId           Int                  @map("racecourse_id")
-  racetrackConditionId   Int                  @map("racetrack_condition_id")
-  racetrackDistanceId    Int                  @map("racetrack_distance_id")
-  raceResultId           Int?                 @map("race_result_id")
-  eventDate              DateTime             @map("event_date")
-  raceNumber             Int                  @map("race_number")
-  createdAt              DateTime             @default(now())
-  racecourse             Racecourse           @relation(fields: [racecourseId], references: [id])
-  racetrackCondition     RacetrackCondition   @relation(fields: [racetrackConditionId], references: [id])
-  racetrackDistance      RacetrackDistance    @relation(fields: [racetrackDistanceId], references: [id])
-  raceResult             RaceResult?          
-  voteHistories          VoteHistory[]
-  horses                 Horse[]
+  id                   Int            @id @default(autoincrement())
+  racecourseId         Int            @map("racecourse_id")
+  racetrackCondition   String
+  racetrackDistance    String
+  raceResultId         Int?           @map("race_result_id")
+  eventDate            DateTime       @map("event_date")
+  raceNumber           Int            @map("race_number")
+  createdAt            DateTime       @default(now())
+  racecourse           Racecourse     @relation(fields: [racecourseId], references: [id])
+  raceResult           RaceResult?    
+  voteHistories        VoteHistory[]
+  horses               Horse[]
 }
 
 model Racecourse {
@@ -76,28 +74,14 @@ model Racecourse {
   races     Race[]
 }
 
-model RacetrackCondition {
-  id          Int      @id @default(autoincrement())
-  conditionName String @map("condition_name")
-  createdAt    DateTime @default(now())
-  races       Race[]
-}
-
-model RacetrackDistance {
-  id        Int      @id @default(autoincrement())
-  distance  Int
-  races     Race[]
-}
-
 model RaceResult {
-  id        Int      @id @default(autoincrement())
-  raceId    Int     @map("race_id") @unique
-  firstHorseId Int  @map("first_horse_id")
-  secondHorseId Int @map("second_horse_id")
-  thirdHorseId Int  @map("third_horse_id")
-  race      Race    @relation(fields: [raceId], references: [id])
-  firstHorse              Horse    @relation("FirstHorse", fields: [firstHorseId], references: [id])
-  secondHorse             Horse    @relation("SecondHorse", fields: [secondHorseId], references: [id])
-  thirdHorse              Horse    @relation("ThirdHorse", fields: [thirdHorseId], references: [id])
-
+  id            Int      @id @default(autoincrement())
+  raceId        Int      @map("race_id") @unique
+  firstHorseId  Int      @map("first_horse_id")
+  secondHorseId Int      @map("second_horse_id")
+  thirdHorseId  Int      @map("third_horse_id")
+  race          Race     @relation(fields: [raceId], references: [id])
+  firstHorse    Horse    @relation("FirstHorse", fields: [firstHorseId], references: [id])
+  secondHorse   Horse    @relation("SecondHorse", fields: [secondHorseId], references: [id])
+  thirdHorse    Horse    @relation("ThirdHorse", fields: [thirdHorseId], references: [id])
 }

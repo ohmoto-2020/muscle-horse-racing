@@ -12,8 +12,6 @@ export const getStaticProps: GetStaticProps = async () => {
   const races = await prisma.race.findMany({
     include: {
       racecourse: true,
-      racetrackCondition: true,
-      racetrackDistance: true,
     },
   });
   const racecourses = await prisma.racecourse.findMany();
@@ -24,13 +22,6 @@ export const getStaticProps: GetStaticProps = async () => {
     createdAt: race.createdAt.toISOString(),
     racecourse: {
       ...race.racecourse,
-    },
-    racetrackCondition: {
-      ...race.racetrackCondition,
-      createdAt: race.racetrackCondition.createdAt.toISOString(),
-    },
-    racetrackDistance: {
-      ...race.racetrackDistance,
     },
   }));
   return {
@@ -58,21 +49,21 @@ export default function RacePage(props: Props) {
     {
       field: "eventDate",
       headerName: "開催日",
-      width: 120,
+      width: 100,
       valueGetter: (params) => params.row.eventDate.split("T")[0],
     },
-    { field: "raceNumber", headerName: "レース番号", width: 100 },
+    { field: "raceNumber", headerName: "レース", sortable: false, width: 70 },
     {
       field: "racetrackCondition",
       headerName: "馬場",
-      width: 70,
-      valueGetter: (params) => params.row.racetrackCondition?.conditionName || "",
+      sortable: false,
+      width: 50,
     },
     {
       field: "racetrackDistance",
       headerName: "距離",
+      sortable: false,
       width: 70,
-      valueGetter: (params) => params.row.racetrackDistance?.distance || "",
     },
   ];
 
@@ -83,25 +74,39 @@ export default function RacePage(props: Props) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
   const handleGet = async (racecourseCode: number, raceNumber: number) => {
-    console.log(raceNumber, racecourseCode);
-    // try {
-    //   const response = await fetch('/api/races', {
-    //     method: 'POST',
-    //     headers: {
-    //       'Content-Type': 'application/json',
-    //     },
-    //     body: JSON.stringify({
-    //       racecourseCode,
-    //       raceNumber,
-    //     }),
-    //   });
-    //   if (!response.ok) {
-    //     throw new Error('スクレイピングに失敗しました');
-    //   }
-    //   // スクレイピング結果の処理...
-    // } catch (error) {
-    //   console.error(error);
-    // }
+    const response = await fetch("/api/scrapeRace", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ racecourseCode, raceNumber }),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      const scrapedData = {
+        racecourseCode,
+        raceNumber,
+        racetrackCondition: data.raceInfo.condition,
+        racetrackDistance: data.raceInfo.distance,
+        horses: data.horseDate,
+      };
+      const saveResponse = await fetch("/api/saveScrapedData", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(scrapedData),
+      });
+
+      if (saveResponse.ok) {
+        console.log("データの保存に成功しました");
+      } else {
+        console.error("データの保存に失敗しました");
+      }
+    } else {
+      console.error("スクレイピングに失敗しました");
+    }
   };
 
   const handleOpen = () => {
@@ -129,6 +134,7 @@ export default function RacePage(props: Props) {
         <DataGrid
           rows={races}
           columns={columns}
+          disableColumnMenu
           onRowClick={(e) => handleClick(e)}
           hideFooterSelectedRowCount={true}
           disableRowSelectionOnClick

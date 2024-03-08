@@ -32,8 +32,6 @@ export const getStaticProps: GetStaticProps = async (context) => {
     where: { id: parseInt(id as string) },
     include: {
       racecourse: true,
-      racetrackCondition: true,
-      racetrackDistance: true,
       raceResult: {
         include: {
           firstHorse: true,
@@ -59,7 +57,6 @@ const headerStyle = {
   backgroundColor: theme.palette.secondary.main,
   color: "#fff",
 };
-
 const oddRowStyle = {
   backgroundColor: "#f5f5f5",
 };
@@ -99,8 +96,8 @@ export default function RaceDetail(props: Props) {
                 {race.racecourse.name}
               </TableCell>
               <TableCell>{race.eventDate.split("T")[0]}</TableCell>
-              <TableCell>{race.racetrackCondition.conditionName}</TableCell>
-              <TableCell>{race.racetrackDistance.distance}</TableCell>
+              <TableCell>{race.racetrackCondition}</TableCell>
+              <TableCell>{race.racetrackDistance}</TableCell>
             </TableRow>
           </TableBody>
         </Table>

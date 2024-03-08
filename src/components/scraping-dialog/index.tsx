@@ -21,7 +21,7 @@ interface Props {
 }
 export const ScrapingDialog = (props: Props) => {
   const { isOpen, onClose, onGet, racecourses } = props;
-  const [racecourseCode, setRacecourseCode] = useState<number>(0);
+  const [racecourseCode, setRacecourseCode] = useState<number>(racecourses[0].code);
   const [raceNumber, setRaceNumber] = useState<number>(1);
 
   const handleGetClick = () => {
@@ -32,15 +32,11 @@ export const ScrapingDialog = (props: Props) => {
   const handleClose = () => {
     onClose();
     setRaceNumber(1);
-    setRacecourseCode(0);
+    setRacecourseCode(racecourses[0].code);
   };
 
   return (
-    <Dialog
-      open={isOpen}
-      onClose={handleClose}
-      maxWidth="xs"
-    >
+    <Dialog open={isOpen} onClose={handleClose} maxWidth="xs">
       <DialogTitle
         sx={{
           mb: "16px",
@@ -75,9 +71,10 @@ export const ScrapingDialog = (props: Props) => {
             レース番号
           </Typography>
           <TextField
-            inputMode="numeric"
+            type="number"
             onChange={(e) => setRaceNumber(Number(e.target.value))}
             value={raceNumber}
+            InputProps={{ inputProps: { min: 1, max: 10 } }}
             sx={{
               width: "50%",
               "& .MuiOutlinedInput-root": {
@@ -91,7 +88,11 @@ export const ScrapingDialog = (props: Props) => {
         <Button onClick={handleClose} variant="contained" color="inherit">
           キャンセル
         </Button>
-        <Button onClick={handleGetClick} variant="contained">
+        <Button
+          disabled={raceNumber === 0 || raceNumber > 10}
+          onClick={handleGetClick}
+          variant="contained"
+        >
           取得する
         </Button>
       </DialogActions>
